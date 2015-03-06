@@ -150,7 +150,7 @@ func createDashboardNode() error {
 	defer conn.Close()
 
 	// make sure root dir is exists
-	rootDir := fmt.Sprintf("/zk/codis/db_%s", globalEnv.ProductName())
+	rootDir := fmt.Sprintf(globalEnv.ZkPathPrefix() + "_%s", globalEnv.ProductName())
 	zkhelper.CreateRecursive(conn, rootDir, "", 0, zkhelper.DefaultDirACLs())
 
 	zkPath := fmt.Sprintf("%s/dashboard", rootDir)

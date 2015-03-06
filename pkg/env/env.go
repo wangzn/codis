@@ -11,6 +11,7 @@ import (
 type Env interface {
 	ProductName() string
 	DashboardAddr() string
+  ZkPathPrefix() string
 	NewZkConn() (zkhelper.Conn, error)
 }
 
@@ -18,6 +19,7 @@ type CodisEnv struct {
 	zkAddr        string
 	dashboardAddr string
 	productName   string
+  zkPathPrefix  string
 }
 
 func LoadCodisEnv(cfg *cfg.Cfg) Env {
@@ -35,6 +37,11 @@ func LoadCodisEnv(cfg *cfg.Cfg) Env {
 		log.Fatal(err)
 	}
 
+	zkPathPrefix, err := cfg.ReadString("zk_path_prefix", "/zk/codis/db_")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	hostname, _ := os.Hostname()
 	dashboardAddr, err := cfg.ReadString("dashboard_addr", hostname+":18087")
 	if err != nil {
@@ -45,6 +52,7 @@ func LoadCodisEnv(cfg *cfg.Cfg) Env {
 		zkAddr:        zkAddr,
 		dashboardAddr: dashboardAddr,
 		productName:   productName,
+    zkPathPrefix:  zkPathPrefix,
 	}
 }
 
@@ -56,6 +64,11 @@ func (e *CodisEnv) DashboardAddr() string {
 	return e.dashboardAddr
 }
 
+func (e *CodisEnv) ZkPathPrefix() string {
+  return e.zkPathPrefix
+}
+
 func (e *CodisEnv) NewZkConn() (zkhelper.Conn, error) {
 	return zkhelper.ConnectToZk(e.zkAddr)
 }
+
